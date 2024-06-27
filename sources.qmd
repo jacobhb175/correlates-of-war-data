@@ -1,0 +1,5 @@
+---
+title: "Sources"
+format: html
+---
+My data draws on the National Materiel Capabilities version 6.0 dataset from the Correlates of War Project (https://correlatesofwar.org/data-sets/national-material-capabilities/). To clean and present the data, I used R and RStudio, ChatGPT, as well as libraries and functions including tidyverse, scales, and ggplot
