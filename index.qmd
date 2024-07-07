@@ -57,6 +57,7 @@ NMC <- majors %>% filter(stateabb %in% major_countries)
 NMC$year <- as.factor(NMC$year)
 NMC$year <- as.integer(NMC$year)
 NMC$year <- (NMC$year+1815)
+NMC <- NMC[NMC$milex > 0,]
 
 # Plot 1: Military expenditure over time for all countries
 NMCplot <- ggplot(NMC, aes(x = year, y = milex, group = stateabb, color = stateabb)) +
@@ -79,9 +80,44 @@ interactive_NMCplot1
 interactive_NMCplot2 <- ggplotly(NMCplot+xlim(1900,2016))
 interactive_NMCplot2
 
-modern_countries <- c("USA", "UKG","RUS","CHN")
+modern_countries <- c("USA","RUS","CHN","JPN")
 gNMC <- NMC %>% filter(stateabb %in% modern_countries)
 
+gNMCplot <- ggplotly(ggplot(gNMC, aes(x = year, y = milex, group = stateabb, color = stateabb)) +
+  geom_line() +
+  labs(title = "Military Expenditure Over Time (1816-2016)", x = "Year", y = "Military Expenditure (log scale)", color="State") +
+  scale_x_continuous() +
+  scale_y_log10(labels = dollar_format(prefix = "$")) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.text = element_text(size = 8)
+  ))
+
+gNMCplot
+
+
+euro <- c("UKG","GMY","ITA","AUH","FRN")
+eNMC <- NMC %>% filter(stateabb %in% euro)
+
+eNMCplot <- ggplotly(ggplot(eNMC, aes(x = year, y = milex, group = stateabb, color = stateabb)) +
+  geom_line() +
+  labs(title = "Military Expenditure Over Time (1816-2016)", x = "Year", y = "Military Expenditure (log scale)", color="State") +
+  scale_x_continuous() +
+  scale_y_log10(labels = dollar_format(prefix = "$")) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.text = element_text(size = 8)
+  ))
+
+eNMCplot
 
 # Save the plot as an image
 # ggsave("enhanced_plot.png", p, width = 10, height = 6)
@@ -103,6 +139,7 @@ gNMC <- NMC %>% filter(stateabb %in% modern_countries)
 #   theme_minimal()
 
 ```
+
 The military expenditures of major powers have varied significantly over the past two centuries. The following data was pulled from the Correlates of War Project on National Materiel Capabilities. Mapping of data was then used to visualize and analyze the evolution of spending over time by country. Since the end of the Cold War, Russian military spending has been falling while Chinese military spending has been rising relative to American military spending.
 
 This plot, using data from the Correlates of War study, displays military expenditures over time on a log scale for 9 countries recorded as "great powers" at some point in the dataset: Austria-Hungary, China, France, Germany, Italy, Japan, Russia, the United Kingdom, and the United States. If a country was not at that time considered a "great power," its figures are not displayed.

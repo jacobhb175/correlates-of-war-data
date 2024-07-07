@@ -1,0 +1,114 @@
+---
+title: "MID"
+---
+
+```{r}
+#| message: false
+#| echo: false
+library(tidyverse)
+library(dplyr)
+library(ggbeeswarm)
+library(plotly)
+DYMID<-read.csv("dyadic_mid_4.02.csv")
+
+DYMID$year <- as.integer(DYMID$year)
+DYMID$strtyr <- as.integer(DYMID$strtyr)
+DYMID_N <- DYMID %>% mutate(modern=case_when((strtyr<1945)~0,(strtyr>=1945)~1))
+DYMID_N <- DYMID_N %>% mutate(nucleara = case_when(
+  (strtyr<1945) ~ -1,
+  (
+    ((namea=="USA") & (strtyr >= 1945)) |
+    ((namea=="RUS") & (strtyr >= 1949)) |
+    ((namea=="UKG") & (strtyr >= 1952)) |
+    ((namea=="FRN") & (strtyr >= 1960)) |
+    ((namea=="CHN") & (strtyr >= 1964)) |
+    ((namea=="ISR") & (strtyr >= 1966)) |
+    ((namea=="IND") & (strtyr >= 1974)) |
+    ((namea=="PAK") & (strtyr >= 1998)) |
+    ((namea=="PRK") & (strtyr >= 2006)) 
+    ) ~ 1,
+  stateb > 450 ~ 0),
+  nuclearb = case_when(
+  (strtyr<1945) ~ -1,
+  (
+    ((nameb=="USA") & (strtyr >= 1945)) |
+    ((nameb=="RUS") & (strtyr >= 1949)) |
+    ((nameb=="UKG") & (strtyr >= 1952)) |
+    ((nameb=="FRN") & (strtyr >= 1960)) |
+    ((nameb=="CHN") & (strtyr >= 1964)) |
+    ((nameb=="ISR") & (strtyr >= 1966)) |
+    ((nameb=="IND") & (strtyr >= 1974)) |
+    ((nameb=="PAK") & (strtyr >= 1998)) |
+    ((nameb=="PRK") & (strtyr >= 2006))
+    ) ~ 1,
+  strtyr  >= 1945 ~ 0) 
+  ) %>%
+  select(nucleara,nuclearb,strtyr,namea,nameb,everything()) %>%
+  arrange(desc(nucleara))
+
+DYMID_N <- DYMID_N |> drop_na() %>% mutate(nuclear=nucleara+nuclearb) %>%
+  select(nuclear,everything()) %>%
+  arrange(desc(nuclear))
+
+#DYMID_N |> ggplot(aes(x=hihost))+geom_bar()+facet_wrap(vars(nuclear))
+DYMID_N <- (DYMID_N |> drop_na())
+# Convert the category to a factor
+# DYMID_N$nuclear <- factor(DYMID_N$nuclear, levels = c(0, 1, 2, NA))
+
+DYMID_N$hihost <- as.factor(DYMID_N$hihost)
+DYMID_N$fatlev <- as.factor(DYMID_N$fatlev)
+#DYMID_N$severity <- as.factor(DYMID_N$severity)
+DYMID_N$modern <- as.factor(DYMID_N$modern)
+DYMID_N$nuclear <- as.factor(DYMID_N$nuclear)
+# DYMID_N$settlmnt <- factor(DYMID_N$settlmnt, levels = c(NA,1, 2, 3))
+DYMID_N$outcome <- factor(DYMID_N$outcome, levels = c(NA,1, 2, 3, 4, 5,6,7,NA,NA))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = severity, fill=nuclear)) +
+  geom_density(alpha=0.8) +
+    facet_wrap(vars(nuclear))+
+  labs(title = "Escalation Pre vs Post 1945", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = severity, y=nuclear)) +
+  geom_jitter() +
+    #geom_smooth(method=lm)+
+  labs(title = "Escalation Pre vs Post 1945", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = modern, fill = outcome)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Escalation Pre vs Post 1945", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = modern, fill = hihost)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation Pre vs Post 1945", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = modern, fill = fatlev)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation Pre vs Post 1945", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = nuclear, fill = outcome)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation ", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = nuclear, fill = hihost)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation ", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = nuclear, fill = fatlev)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation ", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+ggplotly(DYMID_N |> drop_na() |> ggplot(aes(x = nuclear, fill = settlmnt)) +
+  geom_bar(position = "fill") +
+  labs(title = "Escalation ", x = "Pre vs Post 1945", y = "Fill") +
+  scale_fill_discrete(name = "Escalation"))
+
+DYMID_N
+```
